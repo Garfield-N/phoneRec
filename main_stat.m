@@ -16,50 +16,11 @@ resampleFlag = false;
 fprintf('Load data done\n');
 
 %% preprocessing
-NFFT = 128;
-%resample
-init = 50;
-rs = 40;
-%f=linspace(0,1,NFFT/2+1);
-%plot(f,abs(Y(1:NFFT/2+1)));
-for i = 1:n
-    temp = leftX{i,1};
-    %temp=fft(temp,NFFT);
-    temp=temp(1,1:50);
-    %resample
-    temp=myresample(temp,rs,init);
-    leftX{i,1}=abs(temp);
-    
-    temp = leftY{i,1};
-    %temp=fft(temp,NFFT);
-    temp=temp(1,1:50);
-    %resample
-    temp=myresample(temp,rs,init);
-    leftY{i,1}=(abs(temp));
-    %figure;
-    %plot(abs(temp));
-    temp = rightX{i,1};
-    %temp=fft(temp,NFFT);
-    temp=temp(1,1:50);
-    %resample
-    temp=myresample(temp,rs,init);
-    rightX{i,1}=abs(temp);
-    temp = rightY{i,1};
-    %temp=fft(temp,NFFT);
-    temp=temp(1,1:50);
-    %resample
-    temp=myresample(temp,rs,init);
-    rightY{i,1}=abs(temp);
-    %figure;
-    %plot(abs(temp));
-    
-    
-end
 fprintf('preprocessing done\n');
 
 %% NN
 
-nIn = 2*rs;
+nIn = 6;
 nOut =2;
 nHidden=5;
 lRate=0.03;
@@ -76,24 +37,24 @@ h2=zeros(nOut,nData);
 out=zeros(nOut,nData);
 in=[];
 for i=1:80
-    in=[in [leftX{i,1}'; leftY{i,1}']];
+    in=[in [mean(leftX{i,1}); mean(leftY{i,1});max(leftX{i,1}); max(leftY{i,1});min(leftX{i,1}); min(leftY{i,1})]];
     out(1,i)=1;
 end
 for i=1:80
-    in=[in [rightX{i,1}'; rightY{i,1}']];
+    in=[in [mean(rightX{i,1}); mean(rightY{i,1});max(leftX{i,1}); max(leftY{i,1});min(leftX{i,1}); min(leftY{i,1})]];
     out(2,i+80)=1;
 end
 test=[];
 t_out=[];
 for i=1:20
-   test=[test [leftX{80+i}';leftY{80+i,1}']];
+   test=[test [mean(leftX{80+i}); mean(leftY{80+i,1});max(leftX{80+i}); max(leftY{80+i,1});min(leftX{80+i}); min(leftY{80+i,1})]];
    t_out=[t_out [1;0]];
-   test=[test [rightX{80+i}';rightY{80+i,1}']];
+   test=[test [mean(rightX{80+i});mean(rightY{80+i,1});max(rightX{80+i});max(rightY{80+i,1});min(rightX{80+i});min(rightY{80+i,1})]];
    t_out=[t_out [0;1]];
 end
 %256*200
 %50*256
-in=in/5;
+in=in;
 acc_log=[];
 err_log=[];
 for i= 1:epoch
