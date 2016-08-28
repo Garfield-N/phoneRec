@@ -10,8 +10,8 @@ height=1920;
 %% load data
 resampleFlag = false;
 
-[rightX,rightY]=load_data('./CircleRight',resampleFlag);
-[leftX,leftY]=load_data('./CircleLeft',resampleFlag);
+[rightX,rightY]=load_data('./SimpleRight',resampleFlag);
+[leftX,leftY]=load_data('./SimpleLeft',resampleFlag);
 
 fprintf('Load data done\n');
 

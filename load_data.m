@@ -19,8 +19,8 @@ function [X_out,Y_out,Pressure_out]=load_data(data_dir,resampleFlag)
         Y=csvread(fileY);
         Y=Y(1:length(Y)-1)./height;
         if resampleFlag==true
-            X=myresample(X,50,size(X,2));
-            Y=myresample(Y,50,size(Y,2));
+            X=myresample(X,20,size(X,2));
+            Y=myresample(Y,20,size(Y,2));
         end
         X_out{i,1}=X;
         Y_out{i,1}=Y;

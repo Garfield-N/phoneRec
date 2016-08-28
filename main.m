@@ -8,31 +8,31 @@ height=1920;
 
 
 %% load data
-resampleFlag = false;
+resampleFlag = true;
 
-[rightX,rightY]=load_data('./CircleRight',resampleFlag);
-[leftX,leftY]=load_data('./CircleLeft',resampleFlag);
+[rightX,rightY]=load_data('./SimpleRight',resampleFlag);
+[leftX,leftY]=load_data('./SimpleLeft',resampleFlag);
 
 fprintf('Load data done\n');
 
 %% preprocessing
 NFFT = 128;
 %resample
-init = 50;
-rs = 40;
+init = 20;
+rs = 20;
 %f=linspace(0,1,NFFT/2+1);
 %plot(f,abs(Y(1:NFFT/2+1)));
 for i = 1:n
     temp = leftX{i,1};
     %temp=fft(temp,NFFT);
-    temp=temp(1,1:50);
+    %temp=temp(1,1:50);
     %resample
     temp=myresample(temp,rs,init);
     leftX{i,1}=abs(temp);
     
     temp = leftY{i,1};
     %temp=fft(temp,NFFT);
-    temp=temp(1,1:50);
+    %temp=temp(1,1:50);
     %resample
     temp=myresample(temp,rs,init);
     leftY{i,1}=(abs(temp));
@@ -40,13 +40,13 @@ for i = 1:n
     %plot(abs(temp));
     temp = rightX{i,1};
     %temp=fft(temp,NFFT);
-    temp=temp(1,1:50);
+    %temp=temp(1,1:50);
     %resample
     temp=myresample(temp,rs,init);
     rightX{i,1}=abs(temp);
     temp = rightY{i,1};
     %temp=fft(temp,NFFT);
-    temp=temp(1,1:50);
+    %temp=temp(1,1:50);
     %resample
     temp=myresample(temp,rs,init);
     rightY{i,1}=abs(temp);
