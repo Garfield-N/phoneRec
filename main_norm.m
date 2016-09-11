@@ -18,19 +18,20 @@ fprintf('Load data done\n');
 %% preprocessing
 NFFT = 128;
 %resample
-init = 10;
+init = 50;
 rs = 10;
 %f=linspace(0,1,NFFT/2+1);
 %plot(f,abs(Y(1:NFFT/2+1)));
+
 for i = 1:n
     temp = leftX{i,1};
-    temp=fft(temp,NFFT);
+    %temp=fft(temp,NFFT);
     %resample
     temp=myresample(temp,rs,init);
     leftX{i,1}=abs(temp);
     
     temp = leftY{i,1};
-    temp=fft(temp,NFFT);
+    %temp=fft(temp,NFFT);
     %resample
     temp=myresample(temp,rs,init);
     leftY{i,1}=(abs(temp));
@@ -38,12 +39,12 @@ for i = 1:n
     %plot(abs(temp));
     
     temp = rightX{i,1};
-    temp=fft(temp,NFFT);
+    %temp=fft(temp,NFFT);
     temp=myresample(temp,rs,init);
     rightX{i,1}=abs(temp);
     
     temp = rightY{i,1};
-    temp=fft(temp,NFFT);
+    %temp=fft(temp,NFFT);
     temp=myresample(temp,rs,init);
     rightY{i,1}=abs(temp);
     %figure;
@@ -58,7 +59,7 @@ fprintf('preprocessing done\n');
 nIn = 2*rs;
 nOut =2;
 nHidden=5;
-lRate=0.03;
+lRate=0.01;
 epoch=500000;
 nData=160;
 nTest=40;
@@ -87,9 +88,12 @@ for i=1:20
    test=[test [rightX{80+i}';rightY{80+i,1}']];
    t_out=[t_out [0;1]];
 end
-%256*200
-%50*256
-in=in/50;
+
+%normalization
+in_mean=mean(in,2);
+in_std=std(in,1,2);
+in = (in - repmat(in_mean,[1 nData]))./repmat(in_std, [1 nData]);
+in=in/5;
 acc_log=[];
 err_log=[];
 for i= 1:epoch
