@@ -18,19 +18,20 @@ fprintf('Load data done\n');
 %% preprocessing
 NFFT = 128;
 %resample
-init = 10;
-rs = 10;
+init = 50;
+rs = 30;
 %f=linspace(0,1,NFFT/2+1);
 %plot(f,abs(Y(1:NFFT/2+1)));
+
 for i = 1:n
     temp = leftX{i,1};
-    temp=fft(temp,NFFT);
+    %temp=fft(temp,NFFT);
     %resample
     temp=myresample(temp,rs,init);
     leftX{i,1}=abs(temp);
     
     temp = leftY{i,1};
-    temp=fft(temp,NFFT);
+    %temp=fft(temp,NFFT);
     %resample
     temp=myresample(temp,rs,init);
     leftY{i,1}=(abs(temp));
@@ -38,12 +39,12 @@ for i = 1:n
     %plot(abs(temp));
     
     temp = rightX{i,1};
-    temp=fft(temp,NFFT);
+    %temp=fft(temp,NFFT);
     temp=myresample(temp,rs,init);
     rightX{i,1}=abs(temp);
     
     temp = rightY{i,1};
-    temp=fft(temp,NFFT);
+    %temp=fft(temp,NFFT);
     temp=myresample(temp,rs,init);
     rightY{i,1}=abs(temp);
     %figure;
@@ -58,7 +59,7 @@ fprintf('preprocessing done\n');
 nIn = 2*rs;
 nOut =2;
 nHidden=5;
-lRate=0.03;
+lRate=0.01;
 epoch=500000;
 nData=160;
 nTest=40;
@@ -87,17 +88,28 @@ for i=1:20
    test=[test [rightX{80+i}';rightY{80+i,1}']];
    t_out=[t_out [0;1]];
 end
-%256*200
-%50*256
-in=in/50;
+
+
+%normalization
+in_mean=mean(in,2);
+in_std=std(in,1,2);
+in = (in - repmat(in_mean,[1 nData]))./repmat(in_std, [1 nData]);
+
 acc_log=[];
 err_log=[];
+test_err_log=[];
+train_log=[];
 for i= 1:epoch
     %ff
     h1=1./(1+exp(-(w1*in+repmat(b1,[1,nData]))));
     h2=exp((w2*h1+repmat(b2,[1,nData])));
     h2=h2./repmat(sum(h2,1),[2,1]);
     error=sum(sum((out-h2).^2))/nData;
+    
+    [m, ind]=max(h2);
+    [m1, ind1]=max(out);
+    train_acc=(160-sum(abs(ind-ind1)))/160*100;
+    
     %bpp
     err2=out-h2;
     grad_w2=-err2*h1';
@@ -115,6 +127,7 @@ for i= 1:epoch
     h1=1./(1+exp(-(w1*test+repmat(b1,[1,nTest]))));
     h2=exp((w2*h1+repmat(b2,[1,nTest])));
     h2=h2./repmat(sum(h2,1),[2,1]);
+    test_error=sum(sum((t_out-h2).^2))/nTest;
     [m, ind]=max(h2);
     [m1, ind1]=max(t_out);
     acc=(40-sum(abs(ind-ind1)))/40*100;
@@ -123,15 +136,18 @@ for i= 1:epoch
         fprintf('Error %d\nAccuracy %d\n',error,acc);
         acc_log=[acc_log acc];
         err_log=[err_log error];
+        test_err_log=[test_err_log test_error];
+        train_log=[train_log train_acc];
     end
     
 end
 figure;
-plot(acc_log);
+r=1:epoch/1000;
+plot(r,acc_log,'b',r,train_log,'r');
 xlabel('number of epoch *1000');
 ylabel('accuracy');
 figure;
-plot(err_log);
+plot(r,test_err_log,'b',r,err_log,'r');
 xlabel('number of epoch *1000');
 ylabel('error');
 
